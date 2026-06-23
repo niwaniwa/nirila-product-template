@@ -1,0 +1,88 @@
+name: CI
+
+# docs/spec/0006-github-workflow.md / docs/adr/0008-github-scaffolding-iteration.md（accepted）に準拠。
+# 言語非依存テンプレート: 各ジョブは scripts/ci/<name>.sh があれば実行、無ければ「未設定」を通知して成功扱い。
+# プロジェクトに合わせて scripts/ci/{test,lint,typecheck,build}.sh を用意すること。
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# 最小権限（spec 0006 非機能要件）。必要なジョブでのみ write を足す。
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: test
+        run: |
+          if [ -x scripts/ci/test.sh ]; then
+            bash scripts/ci/test.sh
+          else
+            echo "::notice title=CI未設定::scripts/ci/test.sh が未設定です。プロジェクトのテストコマンドを設定してください。"
+          fi
+          # 例(TypeScript): npm ci && npm test
+          # 例(Rails):      bundle install && bundle exec rspec
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: lint
+        run: |
+          if [ -x scripts/ci/lint.sh ]; then
+            bash scripts/ci/lint.sh
+          else
+            echo "::notice title=CI未設定::scripts/ci/lint.sh が未設定です。プロジェクトの lint コマンドを設定してください。"
+          fi
+          # 例(TypeScript): npm run lint
+          # 例(Rails):      bundle exec rubocop
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: typecheck
+        run: |
+          if [ -x scripts/ci/typecheck.sh ]; then
+            bash scripts/ci/typecheck.sh
+          else
+            echo "::notice title=CI未設定::scripts/ci/typecheck.sh が未設定です。型チェックがある言語では設定してください。"
+          fi
+          # 例(TypeScript): npm run typecheck
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: |
+          if [ -x scripts/ci/build.sh ]; then
+            bash scripts/ci/build.sh
+          else
+            echo "::notice title=CI未設定::scripts/ci/build.sh が未設定です。ビルドが必要なプロジェクトでは設定してください。"
+          fi
+          # 例(TypeScript): npm run build
+
+  validate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: validate document frontmatter
+        run: bash scripts/validate-docs.sh
+
+# --- required status checks 化（ファイルでは設定不可・GitHub側で実施）---
+# branch protection で main に対し以下を required にする（ADR 0007 / spec 0006）:
+#   test, lint, typecheck, build, validate-docs, 直push禁止, PR必須, 1レビュー承認必須
+# 例(gh CLI):
+#   gh api -X PUT repos/:owner/:repo/branches/main/protection \
+#     -f required_status_checks.strict=true \
+#     -f 'required_status_checks.contexts[]=test' ... \
+#     -F enforce_admins=true \
+#     -F required_pull_request_reviews.required_approving_review_count=1 \
+#     -F restrictions=

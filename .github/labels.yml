@@ -1,0 +1,53 @@
+# GitHub ラベル定義 — docs/spec/0006-github-workflow.md（accepted）に準拠。
+#
+# label-sync 系 Action（例: micnncim/action-label-syncer, crazy-max/ghaction-github-labeler）で
+# 同期できるリスト形式。手動なら `gh label create <name> --color <hex> --description <desc>`。
+#
+# color は # 抜きの6桁hex。
+
+# --- 種別 (type) ---
+- name: "type:feature"
+  color: "1d76db"
+  description: "新機能・機能追加"
+- name: "type:bug"
+  color: "d73a4a"
+  description: "バグ・不具合"
+- name: "type:refactor"
+  color: "5319e7"
+  description: "振る舞いを変えない内部改善"
+- name: "type:docs"
+  color: "0075ca"
+  description: "ドキュメントのみの変更"
+- name: "type:chore"
+  color: "cfd3d7"
+  description: "雑務・依存更新・設定変更など"
+
+# --- 優先度 (priority) ---
+- name: "priority:P0"
+  color: "b60205"
+  description: "最優先・即対応"
+- name: "priority:P1"
+  color: "d93f0b"
+  description: "高"
+- name: "priority:P2"
+  color: "fbca04"
+  description: "中"
+- name: "priority:P3"
+  color: "0e8a16"
+  description: "低・余力があれば"
+
+# --- 実行主体 ---
+- name: "agent:local"
+  color: "006b75"
+  description: "ローカル隔離agent(supervisor経由)が着手可。受け入れ条件は機械検証可能に"
+- name: "human"
+  color: "5319e7"
+  description: "人間の判断が必要(仕様曖昧/設計/セキュリティ境界など)"
+
+# --- 状態補助 ---
+- name: "blocked"
+  color: "000000"
+  description: "他Issue/外部要因で着手できない"
+- name: "needs-spec"
+  color: "e99695"
+  description: "accepted な spec が未整備。先に spec を用意する"
