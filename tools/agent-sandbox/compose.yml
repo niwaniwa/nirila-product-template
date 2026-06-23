@@ -1,0 +1,94 @@
+name: agent-sandbox
+
+services:
+  egress-proxy:
+    image: ubuntu/squid:latest
+    container_name: agent-sandbox-egress-proxy
+    networks: [isolated, internet]
+    volumes:
+      - ./proxy/squid.conf:/etc/squid/squid.conf:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "squid", "-k", "check"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+      args:
+        CLAUDE_CODE_VERSION: ${CLAUDE_CODE_VERSION:-latest}
+    image: agent-sandbox/claude:${CLAUDE_CODE_VERSION:-latest}
+    profiles: [run]
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+    networks: [isolated]
+    user: "1000:1000"
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    mem_limit: 4g
+    cpus: 2.0
+    init: true
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=128m
+      - /home/agent/tmp:rw,noexec,size=512m
+    environment:
+      HTTP_PROXY: http://egress-proxy:3128
+      HTTPS_PROXY: http://egress-proxy:3128
+      NO_PROXY: localhost,127.0.0.1,egress-proxy
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_CONFIG_DIR: /home/agent/.claude
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+      DISABLE_AUTOUPDATER: "1"
+    volumes:
+      - ${WORKSPACE:?WORKSPACE must be set to an absolute host path}:/workspace
+      - claude-config:/home/agent/.claude
+      - ./shared:/shared:rw
+
+  supervisor:
+    build:
+      context: .
+      dockerfile: Dockerfile.supervisor
+    image: agent-sandbox/supervisor:latest
+    container_name: agent-sandbox-supervisor
+    networks: [supervisor_net]
+    user: "0:0"
+    restart: unless-stopped
+    environment:
+      # supervisor が docker compose を呼ぶとき、bind mount source は host 視点で解釈される。
+      # supervisor 内のパスとホストのパスを一致させるため、${WORKSPACE} を同名でマウントする。
+      SUPERVISOR_WORK_DIR: ${WORKSPACE:?WORKSPACE must be set to an absolute host path}
+      SUPERVISOR_SHARED_DIR: ${WORKSPACE}/tools/agent-sandbox/shared
+      SUPERVISOR_COMPOSE_FILE: ${WORKSPACE}/tools/agent-sandbox/compose.yml
+      SUPERVISOR_POLICY_FILE: /etc/supervisor/policy.yml
+      WORKSPACE: ${WORKSPACE}
+      MAX_CONCURRENT_SUBAGENTS: ${MAX_CONCURRENT_SUBAGENTS:-4}
+      SUPERVISOR_REQUIRE_APPROVAL: ${SUPERVISOR_REQUIRE_APPROVAL:-0}
+      SUPERVISOR_APPROVAL_TIMEOUT_SEC: ${SUPERVISOR_APPROVAL_TIMEOUT_SEC:-60}
+      SUPERVISOR_POLL_MS: ${SUPERVISOR_POLL_MS:-0}
+      SUPERVISOR_LOG_LEVEL: ${SUPERVISOR_LOG_LEVEL:-INFO}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - ${WORKSPACE}:${WORKSPACE}:rw
+      - ./supervisor/policy.yml:/etc/supervisor/policy.yml:ro
+      - ./supervisor/supervisor.py:/opt/supervisor/supervisor.py:ro
+
+volumes:
+  claude-config:
+
+networks:
+  isolated:
+    internal: true
+  internet:
+    driver: bridge
+  supervisor_net:
+    driver: bridge

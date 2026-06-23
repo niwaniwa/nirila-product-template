@@ -1,0 +1,23 @@
+# tools/agent-sandbox/compose.override.example.yml
+#
+# このファイルを compose.override.yml にコピーして、個人カスタマイズを追加する。
+# compose.override.yml は .gitignore 対象であり、コミットしない。
+#
+# 使い方:
+#   cp tools/agent-sandbox/compose.override.example.yml tools/agent-sandbox/compose.override.yml
+#   # 必要箇所を編集
+#   WORKSPACE=$(pwd) docker compose -f tools/agent-sandbox/compose.yml \
+#     -f tools/agent-sandbox/compose.override.yml \
+#     run --rm agent ...
+
+services:
+  agent:
+    environment:
+      # 例: agent CLI のデフォルトモデルを上書きしたい場合
+      # ANTHROPIC_MODEL: claude-opus-4-8
+      EXAMPLE_VAR: "example"
+
+    volumes:
+      # 例: 参考ドキュメントを read-only でマウントしたい場合
+      # - ${REFERENCE_DOCS:-./docs}:/workspace/_reference:ro
+      []
