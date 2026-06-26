@@ -29,7 +29,7 @@ ADR 0007 の決定（接続点 = spec受け入れ基準→Issue、Agent = ロー
 
 - **MUST**:
   - Issueテンプレート（`.github/ISSUE_TEMPLATE/`）に最低2種を用意する: `task`（実装タスク）, `bug`（バグ）。
-  - `task` テンプレは [まとめ資料](../../gitlab_github_agile_scrum_xp_ai_agent_summary.md)のIssue例に準拠し、次を含む: 目的 / 受け入れ条件（チェックボックス）/ 実装方針 / テスト方針 / **触ってよい範囲・触ってはいけない範囲** / 対応spec へのリンク欄（`spec: docs/spec/NNNN-*.md`）。
+  - `task` テンプレはまとめ資料のIssue例に準拠し、次を含む: 目的 / 受け入れ条件（チェックボックス）/ 実装方針 / テスト方針 / **触ってよい範囲・触ってはいけない範囲** / 対応spec へのリンク欄（`spec: docs/spec/NNNN-*.md`）。
   - Issue は1つあたり「小さい単位（1PRで閉じられる粒度）」を原則とする旨をテンプレに明記。
 - **SHOULD**:
   - AI Agent に割り当てる Issue は受け入れ条件が機械検証可能（テストで判定できる）であることをテンプレで促す。
@@ -42,7 +42,7 @@ ADR 0007 の決定（接続点 = spec受け入れ基準→Issue、Agent = ロー
   - 優先度: `priority:P0` `priority:P1` `priority:P2` `priority:P3`
   - 実行主体: `agent:local`（supervisor経由で隔離agentが着手可）, `human`（人間判断が必要）
   - 状態補助: `blocked` `needs-spec`（accepted spec が未整備）
-- **SHOULD**: AI Agentに向く/向かない判定の補助として `agent:local` 付与基準を運用ガイドに記す（[まとめ資料](../../gitlab_github_agile_scrum_xp_ai_agent_summary.md)の向き/不向きリストを基準にする）。
+- **SHOULD**: AI Agentに向く/向かない判定の補助として `agent:local` 付与基準を運用ガイドに記す（まとめ資料の向き/不向きリストを基準にする）。
 
 #### GitHub Projects（継続フロー + velocity観測）
 
