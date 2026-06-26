@@ -17,7 +17,7 @@ decision_owner: "プロジェクトリーダー"
 - **開発モデル**: Water-Scrum-Fall（上流WF / 実装イテレーション / リリースWF、[roadmap.md](../steering/roadmap.md)）
 - **ローカル隔離エージェント基盤**: Docker隔離（[ADR 0003](./0003-agent-execution-docker-isolation.md)）/ 外側supervisor 経由のサブエージェント起動（[ADR 0004](./0004-subagent-execution-pattern.md)）/ observability（[ADR 0005](./0005-observability-stack-langfuse.md)）/ GUI（[ADR 0006](./0006-orchestration-gui-nimbalyst.md)）
 
-一方で、[まとめ資料](../../gitlab_github_agile_scrum_xp_ai_agent_summary.md) が整理した潮流——「上流はScrum/Kanban、実装はXP、実行単位はIssue/PR、品質保証はCIとレビュー」——のうち、**GitHubを使った運用層が未設計**である。具体的には次が空白になっている。
+一方で、まとめ資料が整理した潮流——「上流はScrum/Kanban、実装はXP、実行単位はIssue/PR、品質保証はCIとレビュー」——のうち、**GitHubを使った運用層が未設計**である。具体的には次が空白になっている。
 
 | 層 | 既存 | 空白 |
 |---|---|---|
@@ -58,7 +58,7 @@ decision_owner: "プロジェクトリーダー"
 
 - 1-2週固定スプリント + velocity でコミットメント管理。最もGitLab/Scrumらしい。
 - 利点: 予実管理が締まる。
-- 欠点: 計画イベントのオーバーヘッド。[まとめ資料](../../gitlab_github_agile_scrum_xp_ai_agent_summary.md)が指摘する通り「XPにスプリントは必須でない」。小規模・AI Agent運用では過剰になりやすい。
+- 欠点: 計画イベントのオーバーヘッド。まとめ資料が指摘する通り「XPにスプリントは必須でない」。小規模・AI Agent運用では過剰になりやすい。
 
 #### 選択肢 2-B: 継続フロー（Kanban + WIP制限）
 
@@ -112,7 +112,7 @@ decision_owner: "プロジェクトリーダー"
 
 - trunk-based / GitHub Flow。短命branch + 小さいPR。
 - branch protection で `main` への直push・force-push禁止（[tech.md](../steering/tech.md) の既存制約と整合）、PRレビュー必須、CI required checks 必須。
-- CI（GitHub Actions）は PRごとに `test / lint / typecheck / build` を回す（[まとめ資料](../../gitlab_github_agile_scrum_xp_ai_agent_summary.md)「最低限回すもの」に準拠）。受け入れ基準に対応するテストを TDD で先行させ、CIでgateする。
+- CI（GitHub Actions）は PRごとに `test / lint / typecheck / build` を回す（まとめ資料「最低限回すもの」に準拠）。受け入れ基準に対応するテストを TDD で先行させ、CIでgateする。
 - レビューは三層：**Hooks（ローカル・即時）= 最初の砦 / CI（リモート・網羅）= 最後の砦 / 人間 = 設計・ビジネス判断**（[workflows.md](../guides/workflows.md) の二重構造を人間レビュー込みで拡張）。CODEOWNERS は共同所有（XP）の観点で**厳しくしすぎない**。
 
 ### 5. GitLabっぽさの再現マップ
@@ -150,7 +150,6 @@ decision_owner: "プロジェクトリーダー"
 
 ## 参考
 
-- [まとめ資料: GitLab / GitHub / アジャイル / スクラム / XP / AI Agent 開発](../../gitlab_github_agile_scrum_xp_ai_agent_summary.md)
 - [ADR 0003: エージェント実行は Docker Compose で隔離する](./0003-agent-execution-docker-isolation.md)
 - [ADR 0004: サブエージェントは外側 supervisor 経由で兄弟コンテナ起動する](./0004-subagent-execution-pattern.md)
 - [ADR 0006: オーケストレーション GUI（Nimbalyst）](./0006-orchestration-gui-nimbalyst.md)
