@@ -10,3 +10,9 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# agent-sandbox: 個人カスタマイズ
+tools/agent-sandbox/compose.override.yml
+
+# agent-sandbox: supervisor 共有ディレクトリ (IPC / worktree / audit)
+tools/agent-sandbox/shared/

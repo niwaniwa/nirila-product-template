@@ -1,0 +1,16 @@
+# CODEOWNERS — docs/spec/0006-github-workflow.md / docs/adr/0008（accepted）に準拠。
+#
+# XP の「共同所有」: 既定は広め（誰でも触れる）にし、安全境界に関わるパスのみ厳格化する。
+#
+# ⚠️ @OWNER はプレースホルダ。実在する GitHub ハンドル / Team に置き換えること。
+#    （無効なハンドルを書くと CODEOWNERS は黙って無効化される）
+
+# 既定: リポジトリ全体（共同所有・広め）
+*                                   @OWNER
+
+# --- 安全境界（厳格化）---
+# supervisor は docker.sock を持ち、乗っ取られればホスト権限相当（ADR 0004）。変更は必ずレビュー。
+/tools/agent-sandbox/supervisor/    @OWNER
+# CI・テンプレ・権限・hook 設定の変更は運用の根幹。
+/.github/                           @OWNER
+/scripts/hooks/                     @OWNER

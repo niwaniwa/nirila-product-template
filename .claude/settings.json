@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/home/rila/.claude"
+    ],
+    "allow": [
+      "Bash(bash scripts/validate-docs.sh)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/impl-gate.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

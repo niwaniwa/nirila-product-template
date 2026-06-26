@@ -1,0 +1,42 @@
+# supervisor policy
+#
+# 親 agent から渡せるフィールドと、supervisor が docker compose run に渡す
+# パラメタを「ホワイトリスト方式」で固定する。これにより親 agent が prompt
+# injection で乗っ取られても、policy 外の起動は物理的に作れない。
+
+# 子コンテナの image (glob 可)
+allowed_image: "agent-sandbox/claude:*"
+
+# supervisor が docker compose 起動に使うサービス (固定)
+# compose ファイルのパスは env SUPERVISOR_COMPOSE_FILE で渡る (compose.yml 由来)
+fixed_service: "agent"
+
+# 親 SPAWN_REQUEST に許可するフィールド (他は drop)
+allowed_request_fields:
+  - task_id
+  - prompt
+  - workspace_ref
+
+# 禁止する env var (request 中に出現したら reject)
+forbidden_env:
+  - DOCKER_HOST
+  - ANTHROPIC_BASE_URL_OVERRIDE
+  - LD_PRELOAD
+
+# 禁止する volume パス (現状 supervisor は親からの volume を受け取らないが、
+# 将来 override を許す場合に備えて allowlist 違反の検証ロジックは持っておく)
+forbidden_volume_patterns:
+  - "/var/run/docker.sock"
+  - "/proc"
+  - "/sys"
+  - "$HOME/.ssh"
+  - "$HOME/.aws"
+  - "$HOME/.gnupg"
+  - "$HOME/.docker"
+  - "$HOME/.kube"
+
+# prompt の最大長
+max_prompt_length: 8192
+
+# task_id の形式（UUID4 もしくは英数字 + ハイフン）
+task_id_pattern: "^[A-Za-z0-9-]{1,64}$"

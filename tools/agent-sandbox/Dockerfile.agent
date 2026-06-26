@@ -1,0 +1,24 @@
+FROM node:22-slim
+
+ARG CLAUDE_CODE_VERSION=latest
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        git \
+        less \
+        procps \
+        libcap2-bin \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupmod -n agent node \
+ && usermod -d /home/agent -m -l agent node \
+ && mkdir -p /home/agent/.claude /home/agent/tmp \
+ && chown -R agent:agent /home/agent
+
+RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+ && npm cache clean --force
+
+USER agent
+WORKDIR /workspace
+ENTRYPOINT ["claude"]

@@ -1,7 +1,6 @@
 ---
 id: "NNNN"
 title: ""
-status: wip
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 research_type: ""
